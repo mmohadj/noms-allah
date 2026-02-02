@@ -1,0 +1,331 @@
+/* ====== THEME (Bleu/Vert/Blanc) ====== */
+:root{
+  --bg: #f6fbff;
+  --surface: rgba(255,255,255,.75);
+  --surface-strong: #ffffff;
+  --text: #0f172a;
+  --muted: #475569;
+
+  --primary: #0ea5e9;     /* bleu */
+  --primary-2: #22c55e;   /* vert */
+  --ring: rgba(14,165,233,.25);
+
+  --border: rgba(15, 23, 42, 0.10);
+  --shadow: 0 18px 45px rgba(2, 8, 23, 0.10);
+  --shadow-soft: 0 10px 25px rgba(2, 8, 23, 0.08);
+
+  --radius: 18px;
+}
+
+*{ box-sizing: border-box; }
+
+body{
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  color: var(--text);
+  background:
+    radial-gradient(900px 500px at 20% 5%, rgba(14,165,233,.18), transparent 60%),
+    radial-gradient(900px 500px at 80% 0%, rgba(34,197,94,.14), transparent 60%),
+    linear-gradient(180deg, #f7fbff, #f3fbf7 80%);
+  min-height: 100vh;
+  text-align: left;
+}
+
+/* ====== LAYOUT ====== */
+.wrapper{
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 22px 16px 60px;
+}
+
+header{
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+  background: rgba(246, 251, 255, .65);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-inner{
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  justify-content: space-between;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  min-width: 240px;
+}
+
+.logo{
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  box-shadow: 0 12px 25px rgba(14,165,233,.25);
+}
+
+.brand h1{
+  font-size: 16px;
+  margin: 0;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.brand p{
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ====== NAV ====== */
+nav{
+  display:flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.nav-btn{
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.7);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: .2s ease;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.nav-btn:hover{
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
+  border-color: rgba(14,165,233,.35);
+}
+
+.nav-btn.active{
+  background: linear-gradient(135deg, rgba(14,165,233,.18), rgba(34,197,94,.14));
+  border-color: rgba(14,165,233,.35);
+  box-shadow: 0 10px 22px rgba(14,165,233,.10);
+}
+
+/* ====== SECTIONS ====== */
+main{
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 22px 16px 40px;
+}
+
+section{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 22px;
+}
+
+.hidden{ display:none; }
+
+h2{
+  margin: 0 0 8px;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+
+p{
+  margin: 10px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ====== HERO (Accueil) ====== */
+.hero{
+  display:grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.hero-card{
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.75);
+}
+
+.hero-card strong{
+  color: var(--text);
+}
+
+.badges{
+  display:flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.badge{
+  font-size: 12px;
+  font-weight: 800;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.8);
+  color: var(--text);
+}
+
+/* ====== CARD MEMO ====== */
+#card{
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  margin: 14px auto;
+  max-width: 680px;
+  box-shadow: var(--shadow-soft);
+}
+
+#card h1{
+  margin: 0;
+  font-size: 34px;
+  letter-spacing: .02em;
+}
+
+#card h3{
+  margin: 6px 0 12px;
+  font-size: 15px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+#card p{
+  color: var(--text);
+  margin: 10px 0 0;
+}
+
+/* ====== BUTTONS ====== */
+.actions{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.btn{
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.85);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor:pointer;
+  transition: .2s ease;
+  font-weight: 800;
+}
+
+.btn:hover{
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
+  border-color: rgba(14,165,233,.35);
+}
+
+.btn-primary{
+  border-color: rgba(14,165,233,.35);
+  background: linear-gradient(135deg, rgba(14,165,233,.16), rgba(34,197,94,.12));
+}
+
+.btn-danger{
+  border-color: rgba(239,68,68,.25);
+}
+
+/* ====== QUIZ ====== */
+#quizBox{
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  margin: 14px auto;
+  max-width: 680px;
+  box-shadow: var(--shadow-soft);
+}
+
+#quizBox button{
+  display:block;
+  width: 100%;
+  text-align: left;
+  margin: 8px 0;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.9);
+  cursor:pointer;
+  font-weight: 800;
+  transition: .2s ease;
+}
+
+#quizBox button:hover{
+  border-color: rgba(14,165,233,.35);
+  box-shadow: 0 8px 18px rgba(2, 8, 23, .08);
+  transform: translateY(-1px);
+}
+
+/* ====== FOOTER ====== */
+footer{
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 820px){
+  .header-inner{ gap: 10px; }
+  .brand{ min-width: auto; }
+  .hero{ grid-template-columns: 1fr; }
+}
+
+.tts-row{
+  display:flex;
+  justify-content:flex-end;
+}
+
+.tts-btn{
+  border: 1px solid rgba(14,165,233,.35);
+  background: linear-gradient(135deg, rgba(14,165,233,.14), rgba(34,197,94,.10));
+  color: var(--text);
+  padding: 9px 12px;
+  border-radius: 12px;
+  cursor:pointer;
+  font-weight: 900;
+  transition: .2s ease;
+}
+
+.tts-btn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(14,165,233,.10);
+}
+
+@media (max-width: 500px){
+  h1{ font-size: 28px; }
+  h2{ font-size: 18px; }
+
+  .btn{
+    width: 100%;
+    justify-content: center;
+  }
+
+  nav{
+    gap: 6px;
+  }
+}
+

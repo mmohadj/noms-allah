@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apprendre les 10 noms d’Allah</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <h1>Apprendre les 10 noms d’Allah</h1>
+        <p>Cartes mémo + Quiz • simple, ludique, efficace</p>
+      </div>
+    </div>
+
+    <nav>
+      <button class="nav-btn active" data-target="home">Accueil</button>
+      <button class="nav-btn" data-target="cards">Cartes mémo</button>
+      <button class="nav-btn" data-target="quiz">Quiz</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ACCUEIL -->
+  <section id="home">
+    <div class="hero">
+      <div class="hero-card">
+        <h2>Bienvenue ✨</h2>
+        <p>
+          Apprends <strong>10 noms d’Allah</strong> de manière moderne et agréable.
+          Utilise les <strong>cartes mémo</strong> pour mémoriser, puis teste-toi avec le <strong>quiz</strong>.
+        </p>
+        <div class="badges">
+          <span class="badge">🧠 Mémo</span>
+          <span class="badge">🎯 Quiz</span>
+          <span class="badge">🌿 Calme & focus</span>
+        </div>
+      </div>
+
+      <div class="hero-card">
+        <h2>Mini routine</h2>
+        <p>
+          3 minutes / jour : 5 cartes + 3 questions.
+          La régularité = la clé.
+        </p>
+        <div class="actions" style="justify-content:flex-start">
+          <button class="btn btn-primary" id="goCards">Commencer les cartes</button>
+          <button class="btn" id="goQuiz">Faire un quiz</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CARTES MEMO -->
+  <section id="cards" class="hidden">
+    <h2>Cartes mémo</h2>
+    <p>Lis le nom, puis affiche la traduction quand tu te sens prêt.</p>
+
+    <div id="card"></div>
+
+    <div class="actions">
+      <button class="btn" id="prevBtn">Précédent</button>
+      <button class="btn btn-primary" id="toggleBtn">Afficher la traduction</button>
+      <button class="btn" id="nextBtn">Suivant</button>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="hidden">
+    <h2>Quiz</h2>
+    <p>Choisis la bonne traduction.</p>
+
+    <div id="quizBox"></div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="startQuizBtn">Démarrer</button>
+    </div>
+
+    <div id="scoreBox" class="hidden"></div>
+  </section>
+</main>
+
+<footer>© 2026 • Apprentissage des noms d’Allah • Bleu/Vert/Blanc</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
