@@ -329,3 +329,37 @@ footer{
   }
 }
 
+/* ===== Quiz Score Screen ===== */
+.score-card{
+  background: rgba(255,255,255,.9);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: var(--shadow-soft);
+}
+
+.score-big{
+  font-size: 38px;
+  font-weight: 900;
+  margin: 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.score-pill{
+  display:inline-block;
+  margin-top: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(14,165,233,.12), rgba(34,197,94,.10));
+  font-weight: 900;
+}
+
+.feedback.ok{ color: #16a34a; font-weight: 900; }
+.feedback.bad{ color: #dc2626; font-weight: 900; }
+
+/* Petit plus pour la zone progression */
+#progressText strong{
+  color: var(--text);
+}
+

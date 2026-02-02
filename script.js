@@ -18,6 +18,7 @@ const names = [
 // Helpers
 // =====================
 function $(id) { return document.getElementById(id); }
+
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -25,6 +26,75 @@ function shuffle(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+function escapeQuotes(str) {
+  return str.replaceAll("'", "\\'");
+}
+
+// =====================
+// LocalStorage (progress)
+// =====================
+const STORAGE_KEY = "asmaUser";
+
+function defaultUserData() {
+  return {
+    bestScore: 0,
+    lastScore: 0,
+    wrongAr: [],        // liste des noms (arabe) ratés dans la dernière session
+    updatedAt: null
+  };
+}
+
+function loadUserData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultUserData();
+    const obj = JSON.parse(raw);
+    return { ...defaultUserData(), ...obj };
+  } catch {
+    return defaultUserData();
+  }
+}
+
+function saveUserData(data) {
+  const toSave = { ...data, updatedAt: new Date().toISOString() };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+}
+
+let userData = loadUserData();
+
+function updateHomeProgressUI() {
+  const el = $("progressText");
+  const btnReview = $("reviewWrongBtn");
+
+  if (!el || !btnReview) return;
+
+  const total = names.length;
+  const hasSession = userData.lastScore > 0 || userData.bestScore > 0;
+
+  if (!hasSession) {
+    el.innerHTML = "Aucune session enregistrée pour l’instant. Fais un quiz 😄";
+    btnReview.disabled = true;
+    return;
+  }
+
+  const wrongCount = (userData.wrongAr || []).length;
+
+  el.innerHTML = `
+    Dernière note : <strong>${userData.lastScore} / ${total}</strong><br>
+    Meilleure note : <strong>${userData.bestScore} / ${total}</strong><br>
+    Erreurs (dernière session) : <strong>${wrongCount}</strong>
+  `;
+
+  btnReview.disabled = wrongCount === 0;
+}
+
+function resetProgress() {
+  userData = defaultUserData();
+  saveUserData(userData);
+  updateHomeProgressUI();
+  alert("Progression réinitialisée ✅");
 }
 
 // =====================
@@ -40,14 +110,13 @@ function showSection(sectionId) {
   if (btn) btn.classList.add("active");
 
   if (sectionId === "cards") renderCard();
+  if (sectionId === "home") updateHomeProgressUI();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   // menu
   document.querySelectorAll(".nav-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      showSection(btn.dataset.target);
-    });
+    btn.addEventListener("click", () => showSection(btn.dataset.target));
   });
 
   // raccourcis accueil
@@ -62,8 +131,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // quiz
   $("startQuizBtn").addEventListener("click", startQuiz);
 
+  // progression
+  $("resetProgressBtn").addEventListener("click", resetProgress);
+  $("reviewWrongBtn").addEventListener("click", startWrongReviewSession);
+
   // affichage initial
   showSection("home");
+  updateHomeProgressUI();
 });
 
 // =====================
@@ -115,19 +189,22 @@ function prevCard() {
 }
 
 // =====================
-// Quiz (score sur 10)
+// Quiz (session + score + sauvegarde)
 // =====================
 let quizOrder = [];
 let quizPos = 0;
 let score = 0;
 let currentQuestion = null;
+let wrongArThisSession = []; // noms en arabe ratés dans la session
 
 function startQuiz() {
   quizOrder = shuffle(names);
   quizPos = 0;
   score = 0;
+  wrongArThisSession = [];
 
   $("scoreBox").classList.add("hidden");
+  $("scoreBox").innerHTML = "";
   renderQuestion();
 }
 
@@ -136,15 +213,53 @@ function renderQuestion() {
 
   // Fin du quiz
   if (quizPos >= quizOrder.length) {
+    const total = names.length;
+    const percent = Math.round((score / total) * 100);
+
+    let msg = "";
+    if (percent >= 90) msg = "🔥 Excellent ! Tu maîtrises très bien.";
+    else if (percent >= 70) msg = "✅ Très bien ! Continue comme ça.";
+    else if (percent >= 50) msg = "👍 Bon début ! Refais une session pour progresser.";
+    else msg = "🌱 Pas grave ! Révise les cartes et retente.";
+
+    // ✅ SAUVEGARDE
+    userData.lastScore = score;
+    if (score > userData.bestScore) userData.bestScore = score;
+    userData.wrongAr = [...new Set(wrongArThisSession)]; // unique
+    saveUserData(userData);
+    updateHomeProgressUI();
+
     quizBox.innerHTML = "";
+
     $("scoreBox").classList.remove("hidden");
     $("scoreBox").innerHTML = `
       <div class="score-card">
-        <h3>Résultat</h3>
-        <p>Score : <strong>${score} / ${names.length}</strong></p>
+        <div class="chip">Session Quiz terminée</div>
+        <h3 style="margin:12px 0 0;">Ta note</h3>
+
+        <div class="score-big">${score} / ${total}</div>
+        <div class="score-pill">${percent}%</div>
+
+        <p style="margin-top:12px; color: var(--muted);">${msg}</p>
+
+        ${
+          userData.wrongAr.length > 0
+            ? `<p style="margin-top:10px;color:var(--muted);">
+                 Erreurs à revoir : <strong>${userData.wrongAr.length}</strong>
+               </p>`
+            : `<p style="margin-top:10px;color:var(--muted);">
+                 Aucune erreur, magnifique ✅
+               </p>`
+        }
+
         <div class="actions">
-          <button class="btn btn-primary" onclick="startQuiz()">Rejouer</button>
+          <button class="btn btn-primary" onclick="startQuiz()">Refaire une session</button>
           <button class="btn" onclick="showSection('cards')">Réviser les cartes</button>
+          ${
+            userData.wrongAr.length > 0
+              ? `<button class="btn" onclick="startWrongReviewSession()">Réviser mes erreurs</button>`
+              : ``
+          }
         </div>
       </div>
     `;
@@ -176,10 +291,6 @@ function renderQuestion() {
   `;
 }
 
-function escapeQuotes(str) {
-  return str.replaceAll("'", "\\'");
-}
-
 function answer(choice) {
   const feedback = $("feedback");
   const ok = choice === currentQuestion.fr;
@@ -189,18 +300,124 @@ function answer(choice) {
 
   if (ok) {
     score++;
-    feedback.innerHTML = `✅ Bonne réponse !`;
+    feedback.textContent = "✅ Bonne réponse !";
     feedback.classList.add("ok");
   } else {
+    wrongArThisSession.push(currentQuestion.ar);
     feedback.innerHTML = `❌ Mauvaise réponse. C’était : <strong>${currentQuestion.fr}</strong>`;
     feedback.classList.add("bad");
   }
 
-  // passer à la question suivante
   setTimeout(() => {
     quizPos++;
     renderQuestion();
-  }, 900);
+  }, 850);
+}
+
+// =====================
+// Session “Réviser mes erreurs”
+// (quiz uniquement sur les erreurs de la dernière session)
+// =====================
+let wrongReviewOrder = [];
+let wrongReviewPos = 0;
+let wrongReviewScore = 0;
+
+function startWrongReviewSession() {
+  // recharge au cas où
+  userData = loadUserData();
+
+  const wrongAr = userData.wrongAr || [];
+  if (wrongAr.length === 0) {
+    alert("Tu n’as aucune erreur à réviser ✅");
+    return;
+  }
+
+  // Construire la liste des noms concernés
+  const selected = names.filter(n => wrongAr.includes(n.ar));
+  wrongReviewOrder = shuffle(selected);
+  wrongReviewPos = 0;
+  wrongReviewScore = 0;
+
+  showSection("quiz");
+  $("scoreBox").classList.add("hidden");
+  $("scoreBox").innerHTML = "";
+  renderWrongReviewQuestion();
+}
+
+function renderWrongReviewQuestion() {
+  const quizBox = $("quizBox");
+
+  if (wrongReviewPos >= wrongReviewOrder.length) {
+    const total = wrongReviewOrder.length;
+    const percent = Math.round((wrongReviewScore / total) * 100);
+
+    quizBox.innerHTML = "";
+    $("scoreBox").classList.remove("hidden");
+    $("scoreBox").innerHTML = `
+      <div class="score-card">
+        <div class="chip">Session “Erreurs” terminée</div>
+        <h3 style="margin:12px 0 0;">Ta note</h3>
+
+        <div class="score-big">${wrongReviewScore} / ${total}</div>
+        <div class="score-pill">${percent}%</div>
+
+        <p style="margin-top:12px;color:var(--muted);">
+          Refaire ce mode 2-3 fois et tu vas solidifier direct 🔥
+        </p>
+
+        <div class="actions">
+          <button class="btn btn-primary" onclick="startWrongReviewSession()">Refaire erreurs</button>
+          <button class="btn" onclick="startQuiz()">Revenir au quiz normal</button>
+          <button class="btn" onclick="showSection('cards')">Réviser les cartes</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const q = wrongReviewOrder[wrongReviewPos];
+
+  // 4 choix dont la bonne réponse
+  let choices = shuffle(names).slice(0, 3).map(x => x.fr);
+  if (!choices.includes(q.fr)) choices[0] = q.fr;
+  choices = shuffle(choices);
+
+  quizBox.innerHTML = `
+    <div class="q-head">
+      <div class="chip">Erreurs ${wrongReviewPos + 1} / ${wrongReviewOrder.length}</div>
+    </div>
+
+    <p class="q-title">Quel est le sens de <strong>${q.ar}</strong> ?</p>
+    <p class="q-sub">${q.tr}</p>
+
+    <div class="choices">
+      ${choices.map(c => `<button class="choice-btn" onclick="answerWrongReview('${escapeQuotes(c)}')">${c}</button>`).join("")}
+    </div>
+
+    <div id="feedback" class="feedback"></div>
+  `;
+}
+
+function answerWrongReview(choice) {
+  const feedback = $("feedback");
+  const q = wrongReviewOrder[wrongReviewPos];
+  const ok = choice === q.fr;
+
+  document.querySelectorAll(".choice-btn").forEach(b => b.disabled = true);
+
+  if (ok) {
+    wrongReviewScore++;
+    feedback.textContent = "✅ Bien !";
+    feedback.classList.add("ok");
+  } else {
+    feedback.innerHTML = `❌ C’était : <strong>${q.fr}</strong>`;
+    feedback.classList.add("bad");
+  }
+
+  setTimeout(() => {
+    wrongReviewPos++;
+    renderWrongReviewQuestion();
+  }, 850);
 }
 
 // =====================
@@ -212,15 +429,13 @@ function speakArabic(text) {
     return;
   }
 
-  // Stop si une voix est déjà en cours
   window.speechSynthesis.cancel();
 
   const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = "ar-SA";     // arabe (Arabie Saoudite) - tu peux tester "ar" aussi
-  utter.rate = 0.9;         // vitesse (0.5 -> 2)
-  utter.pitch = 1.0;        // tonalité (0 -> 2)
+  utter.lang = "ar-SA";
+  utter.rate = 0.9;
+  utter.pitch = 1.0;
 
-  // Essayer de choisir une voix arabe si dispo
   const voices = window.speechSynthesis.getVoices();
   const arabicVoice = voices.find(v => (v.lang || "").toLowerCase().startsWith("ar"));
   if (arabicVoice) utter.voice = arabicVoice;
@@ -228,7 +443,6 @@ function speakArabic(text) {
   window.speechSynthesis.speak(utter);
 }
 
-// petit helper pour éviter les problèmes de caractères dans HTML
 function escapeHtml(str) {
   return str
     .replaceAll("&", "&amp;")
@@ -237,4 +451,3 @@ function escapeHtml(str) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
-
